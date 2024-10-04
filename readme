@@ -1,2 +1,10 @@
 ##### A tcp tunnel in Rust that exposes local ports to a remote server learned from [bore](https://github.com/ekzhang/bore)
 
+usage:
+if you want forward local port 8080 to server port 8000, let's say server-ip is 12.12.12.12
+in server `port_proxy server -k encrypt_key -b 0.0.0.0:7000`
+in client `port_proxy client -k encrypt_key -c 12.12.12.12:7000 -p 8080:8000`
+then you can connect 12.12.12.12:8000 to associate with you local port 8080
+
+
+
