@@ -7,7 +7,7 @@ use uuid::Uuid;
 use dashmap::DashMap;
 use crate::shared::DelimitedStream;
 use tokio::time::Duration;
-const CONNECT_TIMEOUT: Duration = Duration::from_secs(1);
+const CONNECT_TIMEOUT: Duration = Duration::from_millis(500);
 pub struct Server{    /// 可选的认证器，用于客户端认证。
     auth: Option<Authenticator>,
 
@@ -45,7 +45,7 @@ impl Server {
     async fn handle_connection(&self, stream: TcpStream) -> anyhow::Result<()> {
         let mut stream = DelimitedStream::new(stream);
         if let Some(auth) = &self.auth {
-            auth.server_handshake(&mut stream).await?;
+            // auth.server_handshake(&mut stream).await?;
             if let Some(auth) =&self.auth{
                 if let Err(e) = auth.server_handshake(&mut stream).await{
                     error!("Error: {}", e);
@@ -66,6 +66,10 @@ impl Server {
                 };
                 stream.send(ServerMessage::Hello(port)).await?;
                 loop{
+                    if stream.send(ServerMessage::HeartBeat).await.is_err() {
+                        // Assume that the TCP connection has been dropped.
+                        return Ok(());
+                    }
                     if let Ok(res) = tokio::time::timeout(CONNECT_TIMEOUT,listener.accept()).await{
                         match res{
                             Ok((income_stream,_addr))=>{
@@ -76,7 +80,7 @@ impl Server {
                                 tokio::spawn(async move { // 启动异步任务处理连接。
                                     tokio::time::sleep(Duration::from_secs(10)).await;
                                     if conns.remove(&id).is_some() {
-                                        warn!("移除过期连接:{}",id);
+                                        warn!("remove timeouted connection:{}",id);
                                     }
                                 });
                                 stream.send(ServerMessage::Connection(id)).await?;
@@ -93,16 +97,16 @@ impl Server {
             },
             Some(ClientMessage::Accept(id)) =>{
                 info!("accept connection:{} and start forward stream",id);
-                if let Some((_id,mut income_stream)) = self.conns.remove(&id) {
-                    let parts = stream.into_parts();
-                    income_stream.write_all(&parts.read_buf).await?;
-                    let local_stream = parts.io;
-                    proxy(local_stream, income_stream).await?;
-                } else {
-                    stream.send(ServerMessage::Error("invalid connection id".to_string())).await?;
-                    return Ok(());
+                match self.conns.remove(&id) {
+                    Some((_, mut stream2)) => {
+                        let parts = stream.into_parts();
+                        debug_assert!(parts.write_buf.is_empty(), "framed write buffer not empty");
+                        stream2.write_all(&parts.read_buf).await?;
+                        proxy(parts.io, stream2).await?
+                    },
+                    None => warn!("missing connection"),
                 }
-                self.conns.remove(&id);
+                return Ok(());
 
             },
             Some(ClientMessage::ChallengeResponse(_)) =>{},
