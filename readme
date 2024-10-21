@@ -1,10 +1,58 @@
-##### A tcp tunnel in Rust that exposes local ports to a remote server learned from [bore](https://github.com/ekzhang/bore)
+# Port Proxy
 
-usage:
-if you want forward local port 8080 to server port 8000, let's say server-ip is 12.12.12.12
-in server `port_proxy server -k encrypt_key -b 0.0.0.0:7000`
-in client `port_proxy client -k encrypt_key -c 12.12.12.12:7000 -p 8080:8000`
-then you can connect 12.12.12.12:8000 to associate with you local port 8080
+## Introduction
 
+**Port Proxy** is a lightweight TCP port forwarding tool written in Rust. It allows you to securely forward ports between a client and a server, making it useful for various network routing and proxying scenarios. With encryption support, you can protect the data transmitted between the client and the server.
 
+## Features
 
+- **Secure Port Forwarding**: All traffic between the client and server is encrypted using a user-provided key.
+- **Lightweight and Fast**: Built with Rust, it provides a high-performance, low-latency proxy solution.
+- **Simple Configuration**: Minimal setup required to establish secure port forwarding between a client and a server.
+
+## Usage
+
+Here’s how you can use **Port Proxy** to forward traffic from a local port to a remote server port.
+
+### Example
+
+Let’s assume you want to forward your local port `8080` to the server's port `8000`, and the server's IP address is `12.12.12.12`.
+
+1. On the **server** side, run:
+  
+  `port_proxy server -k <encryption_key> -b 0.0.0.0:7000`
+  
+  This command sets up a server that listens on port `7000` with the specified encryption key.
+  
+2. On the **client** side, run:
+  
+  `port_proxy client -k <encryption_key> -c 12.12.12.12:7000 -p 8080:8000`
+  
+  This forwards the local port `8080` to the server port `8000` over the encrypted connection established through port `7000`.
+  
+
+Now, connecting to `12.12.12.12:8000` will route traffic through your local port `8080`.
+
+### Building from Source
+
+To build and run the project using Rust, clone the repository and use the following commands:
+
+1. Run the server:
+  
+  `cargo run -- server -k <encryption_key> -b 0.0.0.0:7000`
+  
+2. Run the client:
+  
+  `cargo run -- client -k <encryption_key> -c 12.12.12.12:7000 -p 8080:8000`
+  
+
+This will build the binaries and start the port forwarding.
+
+## Requirements
+
+- Rust installed (https://www.rust-lang.org/)
+- cargo build
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
