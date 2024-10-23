@@ -1,5 +1,5 @@
 # Port Proxy
-**Port Proxy** is a lightweight TCP port forwarding tool written in Rust. It allows you to securely forward ports between a client and a server, making it useful for various network routing and proxying scenarios. With encryption support, you can protect the data transmitted between the client and the server.
+Port Proxy is a lightweight TCP port forwarding tool written in Rust. It allows you to securely forward ports between a client and a server, making it useful for various network routing and proxying scenarios. With encryption support, you can protect the data transmitted between the client and the server.
 
 ## Features
 
