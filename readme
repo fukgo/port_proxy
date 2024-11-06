@@ -1,55 +1,78 @@
+可以从多个角度来优化和修改这个项目的说明文档，使其更清晰或添加更多信息。以下是一些建议的修改：
+
+---
+
 # Port Proxy
-Port Proxy is a lightweight TCP port forwarding tool written in Rust. It allows you to securely forward ports between a client and a server, making it useful for various network routing and proxying scenarios. With encryption support, you can protect the data transmitted between the client and the server.
 
-## Features
+**Port Proxy** 是一个用 Rust 编写的轻量级 TCP 端口转发工具，允许在客户端和服务器之间安全地转发端口，适用于各种网络路由和代理场景。支持加密功能，可以保护客户端和服务器之间传输的数据。
 
-- **Secure Port Forwarding**: All traffic between the client and server is encrypted using a user-provided key.
-- **Lightweight and Fast**: Built with Rust, it provides a high-performance, low-latency proxy solution.
-- **Simple Configuration**: Minimal setup required to establish secure port forwarding between a client and a server.
+## 功能特性
 
-## Usage
+- **安全端口转发**：客户端和服务器之间的所有流量都使用用户提供的密钥加密，确保数据安全。
+- **轻量快速**：基于 Rust 构建，提供高性能、低延迟的代理解决方案。
+- **简单配置**：设置简单，几步即可在客户端和服务器之间建立安全的端口转发。
 
-Here’s how you can use **Port Proxy** to forward traffic from a local port to a remote server port.
+## 使用方法
 
-### Example
+以下是使用 **Port Proxy** 将本地端口流量转发到远程服务器端口的示例。
 
-Let’s assume you want to forward your local port `8080` to the server's port `8000`, and the server's IP address is `12.12.12.12`.
+### 示例
 
-1. On the **server** side, run:
-  
-  `port_proxy server -k <encryption_key> -b 0.0.0.0:7000`
-  
-  This command sets up a server that listens on port `7000` with the specified encryption key.
-  
-2. On the **client** side, run:
-  
-  `port_proxy client -k <encryption_key> -c 12.12.12.12:7000 -p 8080:8000`
-  
-  This forwards the local port `8080` to the server port `8000` over the encrypted connection established through port `7000`.
-  
+假设您希望将本地端口 `8080` 的流量转发到服务器的端口 `8000`，服务器的 IP 地址是 `12.12.12.12`。
 
-Now, connecting to `12.12.12.12:8000` will route traffic through your local port `8080`.
+1. 在**服务器**端运行以下命令：
+   
+   ```bash
+   port_proxy server -k <encryption_key> -b 0.0.0.0:7000
+   ```
+   
+   此命令设置了一个监听在 `7000` 端口的服务器，并使用指定的加密密钥。
 
-### Building from Source
+2. 在**客户端**运行以下命令：
+   
+   ```bash
+   port_proxy client -k <encryption_key> -c 12.12.12.12:7000 -p 8080:8000
+   ```
+   
+   这会将本地端口 `8080` 的流量转发到服务器的 `8000` 端口，通过 `7000` 端口的加密连接实现。
 
-To build and run the project using Rust, clone the repository and use the following commands:
+配置完成后，通过访问 `localhost:8080` 的流量将会安全地转发到 `12.12.12.12:8000`。
 
-1. Run the server:
-  
-  `cargo run -- server -k <encryption_key> -b 0.0.0.0:7000`
-  
-2. Run the client:
-  
-  `cargo run -- client -k <encryption_key> -c 12.12.12.12:7000 -p 8080:8000`
-  
+### 从源码构建
 
-This will build the binaries and start the port forwarding.
+如果需要从源码构建并运行该项目，可按照以下步骤操作：
 
-## Requirements
+1. 克隆仓库：
+   
+   ```bash
+   git clone <repository-url>
+   cd port_proxy
+   ```
 
-- Rust installed (https://www.rust-lang.org/)
-- cargo build
+2. 运行服务器端：
 
-## License
+   ```bash
+   cargo run -- server -k <encryption_key> -b 0.0.0.0:7000
+   ```
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+3. 运行客户端：
+
+   ```bash
+   cargo run -- client -k <encryption_key> -c 12.12.12.12:7000 -p 8080:8000
+   ```
+
+以上命令会构建二进制文件并启动端口转发。
+
+## 安装依赖
+
+- Rust 编译环境（安装教程见 https://www.rust-lang.org/）
+- 使用 `cargo build` 进行构建
+
+## 安全提示
+
+- **密钥管理**：请确保加密密钥的安全性，不要将其公开或上传到版本控制系统。
+- **防火墙配置**：确保服务器端所监听的端口（如 `7000`）在防火墙中开放。
+
+## 授权协议
+
+此项目基于 MIT 许可证。详细信息请参见 LICENSE 文件。
